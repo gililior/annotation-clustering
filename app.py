@@ -52,7 +52,7 @@ def generate_colors_map(df):
     return color_map
 
 
-def generate_sidebar_linking(color_map, line_numbers, total, mode):
+def generate_sidebar_linking(color_map, line_numbers, total):
     sorted_keys = sorted(line_numbers, key=lambda k: line_numbers[k][0])
     for representative in sorted_keys:
         id_rep = get_id_rep(representative)
@@ -128,12 +128,12 @@ def main():
     filtered_df = filtered_df.sort_values(by=['title_index']).reset_index()
 
     if not filtered_df.empty:
-        display_single_file(color_map, filtered_df, mode)
+        display_single_file(color_map, filtered_df)
     else:
         st.write("Selected file not found in the CSV.")
 
 
-def display_single_file(color_map, filtered_df, mode):
+def display_single_file(color_map, filtered_df):
 
     st.header("Text Content:")
 
@@ -167,7 +167,7 @@ def display_single_file(color_map, filtered_df, mode):
             unsafe_allow_html=True)
         line_numbers[label] = (line_numbers[label], len(all_paragraphs))
 
-    generate_sidebar_linking(color_map, line_numbers, len(all_paragraphs)+1, mode)
+    generate_sidebar_linking(color_map, line_numbers, len(all_paragraphs)+1)
 
 
 def get_id_rep(representative):
