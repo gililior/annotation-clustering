@@ -24,6 +24,8 @@ if "ws" not in st.session_state:
     gc = gspread.service_account_from_dict(credentials)
     # 2. Load the sheet
     sh = gc.open("cluster-annotation")
+    while not st.button("10k") and not st.button("CUAD"):
+        pass
     option = st.selectbox('Choose dataset', ('CUAD', '10k'))
     st.session_state.df_path = f"{option}.csv"
     # 3. Open the specific worksheet
