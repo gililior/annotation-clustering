@@ -24,8 +24,10 @@ if "ws" not in st.session_state:
     gc = gspread.service_account_from_dict(credentials)
     # 2. Load the sheet
     sh = gc.open("cluster-annotation")
+    option = st.selectbox('Choose dataset', ('CUAD', '10k'))
+    st.session_state.df_path = f"{option}.csv"
     # 3. Open the specific worksheet
-    st.session_state.ws = sh.worksheet('Sheet1')
+    st.session_state.ws = sh.worksheet(option)
     st.session_state.first_row_index = len(st.session_state.ws.col_values(1)) + 1
     # 2. Update the sheet
     st.session_state.ws.update('A' + str(st.session_state.first_row_index), 'username')
@@ -89,7 +91,7 @@ def main():
     # File selection
     # Load CSV data
     if "df" not in st.session_state:
-        st.session_state["df"] = pd.read_csv("CUAD.csv")
+        st.session_state["df"] = pd.read_csv(st.session_state.df_path)
     df = st.session_state["df"]
 
     # Set a variable once after a new CSV file is loaded
