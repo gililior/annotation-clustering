@@ -128,7 +128,8 @@ def main():
     st.write(selected_file)
     # Filter dataframe based on selected file
     filtered_df = df.loc[group_by_filename[selected_file]]
-    st.session_state.filtered_df = filtered_df.sort_values(by=['title_index']).reset_index()
+    filtered_df = filtered_df.sort_values(by=['title_index']).reset_index()
+    st.session_state.len_file = len(filtered_df)
 
     if not filtered_df.empty:
         display_single_file(color_map, filtered_df)
@@ -137,7 +138,7 @@ def main():
 
 
 def validate_ranges(representative_map_to_column):
-    indices_covered = np.full((len(st.session_state.filtered_df),), fill_value=False)
+    indices_covered = np.full((st.session_state.len_file,), fill_value=False)
     for representative in representative_map_to_column:
         if representative in st.session_state:
             if np.any(indices_covered[st.session_state[representative][0]-1:st.session_state[representative][1]]):
@@ -145,6 +146,7 @@ def validate_ranges(representative_map_to_column):
                 return False
             indices_covered[st.session_state[representative][0] - 1:st.session_state[representative][1]] = True
     return True
+
 
 def display_single_file(color_map, filtered_df):
 
