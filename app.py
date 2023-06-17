@@ -108,19 +108,22 @@ def main():
 
     all_files = list(group_by_filename.keys())
     if st.button('submit'):
-        st.session_state.i += 1
-        # write session state slider
-        # Update the google sheet
-        # 1. Find in which row we need to put the new annotations
-        next_row_ind = len(st.session_state.ws.col_values(1)) + 1
-        # 2. Update the sheet
-        st.session_state.ws.update('A' + str(next_row_ind), 'tbd')
-        st.session_state.ws.update('B' + str(next_row_ind), all_files[st.session_state.i - 1])
-        for representative in representative_map_to_column:
-            if representative in st.session_state:
-                letter = representative_map_to_column[representative]
-                st.session_state.ws.update(letter + str(next_row_ind), str(st.session_state[representative]))
-                st.session_state.pop(representative)
+        # validate
+        valid = validate_ranges(representative_map_to_column, filtered_df)
+        if valid:
+            st.session_state.i += 1
+            # write session state slider
+            # Update the google sheet
+            # 1. Find in which row we need to put the new annotations
+            next_row_ind = len(st.session_state.ws.col_values(1)) + 1
+            # 2. Update the sheet
+            st.session_state.ws.update('A' + str(next_row_ind), 'tbd')
+            st.session_state.ws.update('B' + str(next_row_ind), all_files[st.session_state.i - 1])
+            for representative in representative_map_to_column:
+                if representative in st.session_state:
+                    letter = representative_map_to_column[representative]
+                    st.session_state.ws.update(letter + str(next_row_ind), str(st.session_state[representative]))
+                    st.session_state.pop(representative)
     selected_file = all_files[st.session_state.i]
     st.write(selected_file)
     # Filter dataframe based on selected file
@@ -132,6 +135,16 @@ def main():
     else:
         st.write("Selected file not found in the CSV.")
 
+
+def validate_ranges(representative_map_to_column, filtered_df):
+    indices_covered = np.full((len(filtered_df),), fill_value=False)
+    for representative in representative_map_to_column:
+        if representative in st.session_state:
+            if np.any(indices_covered[st.session_state[representative][0]-1:st.session_state[representative][1]]):
+                print(f"ranges are incorrect for {representative}")
+                return False
+            indices_covered[st.session_state[representative][0] - 1:st.session_state[representative][1]] = True
+    return True
 
 def display_single_file(color_map, filtered_df):
 
