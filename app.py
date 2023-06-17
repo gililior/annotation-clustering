@@ -109,7 +109,7 @@ def main():
     all_files = list(group_by_filename.keys())
     if st.button('submit'):
         # validate
-        valid = validate_ranges(representative_map_to_column, filtered_df)
+        valid = validate_ranges(representative_map_to_column)
         if valid:
             st.session_state.i += 1
             # write session state slider
@@ -128,7 +128,7 @@ def main():
     st.write(selected_file)
     # Filter dataframe based on selected file
     filtered_df = df.loc[group_by_filename[selected_file]]
-    filtered_df = filtered_df.sort_values(by=['title_index']).reset_index()
+    st.session_state.filtered_df = filtered_df.sort_values(by=['title_index']).reset_index()
 
     if not filtered_df.empty:
         display_single_file(color_map, filtered_df)
@@ -136,8 +136,8 @@ def main():
         st.write("Selected file not found in the CSV.")
 
 
-def validate_ranges(representative_map_to_column, filtered_df):
-    indices_covered = np.full((len(filtered_df),), fill_value=False)
+def validate_ranges(representative_map_to_column):
+    indices_covered = np.full((len(st.session_state.filtered_df),), fill_value=False)
     for representative in representative_map_to_column:
         if representative in st.session_state:
             if np.any(indices_covered[st.session_state[representative][0]-1:st.session_state[representative][1]]):
