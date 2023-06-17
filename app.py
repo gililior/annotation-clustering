@@ -142,7 +142,7 @@ def validate_ranges(representative_map_to_column):
     for representative in representative_map_to_column:
         if representative in st.session_state:
             if np.any(indices_covered[st.session_state[representative][0]-1:st.session_state[representative][1]]):
-                print(f"ranges are incorrect for {representative}")
+                st.error(f"ranges are incorrect for {representative}")
                 return False
             indices_covered[st.session_state[representative][0] - 1:st.session_state[representative][1]] = True
     return True
