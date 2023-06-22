@@ -131,20 +131,17 @@ def main():
     color_map = st.session_state['color_map']
     representative_map_to_column = st.session_state['column_map']
 
-    st.sidebar.markdown("<h3 style='font-size: 24px;'>ToC (color mapping)</h3>",
-                        unsafe_allow_html=True)
-
     group_by_filename = df.groupby("filename").groups
 
     if 'user_files_list' not in st.session_state:
         all_files = list(group_by_filename.keys())
         get_user_files_list(all_files)
     user_files = st.session_state['user_files_list']
-    # remove files that the user already saw
-    # remove files with more than two annotators
-    # get all the files with one annotator - shuffle them and put them first
-    # shuffle the files with 0 annotators and put last
-    # save the list in a session state
+
+    st.sidebar.progress(value=st.session_state.i / len(user_files))
+    st.sidebar.markdown("<h3 style='font-size: 24px;'>ToC (color mapping)</h3>",
+                        unsafe_allow_html=True)
+
     if st.button('submit'):
         # validate
         valid = validate_ranges(representative_map_to_column)
