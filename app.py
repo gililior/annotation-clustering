@@ -28,6 +28,7 @@ if "ws" not in st.session_state:
     st.session_state.ws.update('A' + str(st.session_state.first_row_index), 'username')
     st.session_state.ws.update('B' + str(st.session_state.first_row_index), 'filename')
     st.session_state.i = 0
+    st.session_state.cur_page = 0
 
 
 def generate_random_colors(length):
@@ -94,8 +95,29 @@ def generate_rep_map_to_column(df):
     return rep_to_column
 
 
+def get_user_files_list(all_files):
+    """ checks which files the user haven't seen yet.
+    prioritizes files with one annotator, ignore files with more than 2 annotators"""
+    rows = st.session_state.ws.get_all_values()
+    annotations_df = pd.DataFrame(rows)
+    group_by_filename = annotations_df.groupby(1).groups
+    one_annotator_file = []
+    for filename in group_by_filename:
+        if filename == "filename":
+            continue
+        file_rows = annotations_df.loc[group_by_filename[filename]]
+        all_files.remove(filename)
+        if st.session_state.username in file_rows[0].values:
+            continue
+        if len(group_by_filename[filename]) == 1:
+            one_annotator_file.append(filename)
+    random.shuffle(one_annotator_file)
+    random.shuffle(all_files)
+    st.session_state.user_files_list = one_annotator_file + all_files
+
+
 def main():
-    st.title("Conceptual ToC Viewer")
+    st.title("Conceptual ToC Annotator")
 
     if "df" not in st.session_state:
         st.session_state["df"] = load_csv("CUAD.csv")
@@ -114,22 +136,30 @@ def main():
 
     group_by_filename = df.groupby("filename").groups
 
-    all_files = list(group_by_filename.keys())
+    if 'user_files_list' not in st.session_state:
+        all_files = list(group_by_filename.keys())
+        get_user_files_list(all_files)
+    user_files = st.session_state['user_files_list']
+    # remove files that the user already saw
+    # remove files with more than two annotators
+    # get all the files with one annotator - shuffle them and put them first
+    # shuffle the files with 0 annotators and put last
+    # save the list in a session state
     if st.button('submit'):
         # validate
         valid = validate_ranges(representative_map_to_column)
         if valid:
             st.session_state.i += 1
             next_row_ind = len(st.session_state.ws.col_values(1)) + 1
-            st.session_state.ws.update('A' + str(next_row_ind), 'tbd')
-            st.session_state.ws.update('B' + str(next_row_ind), all_files[st.session_state.i - 1])
+            st.session_state.ws.update('A' + str(next_row_ind), st.session_state.username)
+            st.session_state.ws.update('B' + str(next_row_ind), user_files[st.session_state.i - 1])
             for representative in representative_map_to_column:
                 if st.session_state[f"{representative}_checkbox"]:
                     letter = representative_map_to_column[representative]
                     st.session_state.ws.update(letter + str(next_row_ind), str(st.session_state[f"{representative}_range"]))
                 st.session_state.pop(f"{representative}_range")
                 st.session_state.pop(f"{representative}_checkbox")
-    selected_file = all_files[st.session_state.i]
+    selected_file = user_files[st.session_state.i]
     st.write(selected_file)
     # Filter dataframe based on selected file
     filtered_df = df.loc[group_by_filename[selected_file]]
@@ -235,5 +265,28 @@ def get_paragraphs(filtered_df):
     return all_paragraphs, labels_start_end
 
 
+def hello_page():
+    st.header('Conceptual ToC Annotator')
+    st.markdown('Hello! Please enter your username')
+    st.text_input('Username', key='username_box')
+
+    st.button('Next', key='next_button0', on_click=record_name)
+
+
+def record_name():
+    if len(st.session_state.username_box) == 0:
+        st.error('You must enter a valid username')
+    else:
+        st.session_state.username = st.session_state.username_box
+        next_page()
+
+
+def next_page():
+    st.session_state.cur_page += 1
+
+
 if __name__ == '__main__':
-    main()
+    if st.session_state.cur_page == 0:
+        hello_page()
+    else:
+        main()
