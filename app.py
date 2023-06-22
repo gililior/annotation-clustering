@@ -27,6 +27,7 @@ if "ws" not in st.session_state:
     st.session_state.first_row_index = len(st.session_state.ws.col_values(1)) + 1
     st.session_state.ws.update('A' + str(st.session_state.first_row_index), 'username')
     st.session_state.ws.update('B' + str(st.session_state.first_row_index), 'filename')
+    st.session_state.ws.update('C' + str(st.session_state.first_row_index), 'file_length')
     st.session_state.i = 0
     st.session_state.cur_page = 0
 
@@ -88,7 +89,7 @@ def generate_rep_map_to_column(df):
     representatives = df[df["best_cluster"] == True].representative.unique()
     rep_to_column = {}
     for i, rep in enumerate(representatives):
-        index_letter = i+2
+        index_letter = i+3
         letter = string.ascii_uppercase[index_letter]
         st.session_state.ws.update(letter + str(st.session_state.first_row_index), rep)
         rep_to_column[rep] = letter
@@ -151,6 +152,7 @@ def main():
             next_row_ind = len(st.session_state.ws.col_values(1)) + 1
             st.session_state.ws.update('A' + str(next_row_ind), st.session_state.username)
             st.session_state.ws.update('B' + str(next_row_ind), user_files[st.session_state.i - 1])
+            st.session_state.ws.update('C' + str(next_row_ind), st.session_state.len_file)
             for representative in representative_map_to_column:
                 if st.session_state[f"{representative}_checkbox"]:
                     letter = representative_map_to_column[representative]
