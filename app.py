@@ -22,12 +22,9 @@ credentials = {
 
 if "ws" not in st.session_state:
     gc = gspread.service_account_from_dict(credentials)
-    # 2. Load the sheet
     sh = gc.open("cluster-annotation")
-    # 3. Open the specific worksheet
     st.session_state.ws = sh.worksheet("CUAD")
     st.session_state.first_row_index = len(st.session_state.ws.col_values(1)) + 1
-    # 2. Update the sheet
     st.session_state.ws.update('A' + str(st.session_state.first_row_index), 'username')
     st.session_state.ws.update('B' + str(st.session_state.first_row_index), 'filename')
     st.session_state.i = 0
@@ -56,14 +53,29 @@ def generate_sidebar_linking(color_map, line_numbers, total):
     sorted_keys = sorted(line_numbers, key=lambda k: line_numbers[k][0])
     for representative in sorted_keys:
         id_rep = get_id_rep(representative)
-        start, end = line_numbers[representative]
         st.sidebar.markdown(
-            f"<a style='border: 3px solid {color_map[representative]}; padding: 5px; font-size: 16px; color: black;' href='#{id_rep}'>{representative}</a>",
+            f"<a style='border: 3px solid {color_map[representative]}; padding: 5px; "
+            f"font-size: 16px; color: black;' href='#{id_rep}'>{representative}</a>",
             unsafe_allow_html=True)
-        st.sidebar.select_slider(label='select range', label_visibility='hidden',
-                                 key=representative,
-                                 options=list(np.arange(1, total)), value=[start, end])
+        add_widgets_for_rep(representative, total)
+    for representative in color_map:
+        if representative in line_numbers:
+            continue
+        st.sidebar.markdown(
+            f"<a style='border: 3px solid {color_map[representative]}; "
+            f"padding: 5px; font-size: 16px; color: gray;'>{representative}</a>",
+            unsafe_allow_html=True)
+        add_widgets_for_rep(representative, total)
 
+
+def add_widgets_for_rep(representative, total):
+    st.sidebar.checkbox(label='', key=f"{representative}_checkbox",
+                        value=st.session_state[f"{representative}_checkbox"])
+    st.sidebar.select_slider(representative, label_visibility='hidden',
+                             options=list(np.arange(1, total)),
+                             value=st.session_state[f"{representative}_range"],
+                             key=f"{representative}_range",
+                             disabled=not st.session_state[f"{representative}_checkbox"])
 
 
 @st.cache
@@ -83,16 +95,12 @@ def generate_rep_map_to_column(df):
 
 
 def main():
-    # Page title and description
     st.title("Conceptual ToC Viewer")
 
-    # File selection
-    # Load CSV data
     if "df" not in st.session_state:
-        st.session_state["df"] = pd.read_csv("CUAD.csv")
+        st.session_state["df"] = load_csv("CUAD.csv")
     df = st.session_state["df"]
 
-    # Set a variable once after a new CSV file is loaded
     if 'color_map' not in st.session_state:
         color_map = generate_colors_map(df)
         st.session_state['color_map'] = color_map
@@ -112,18 +120,15 @@ def main():
         valid = validate_ranges(representative_map_to_column)
         if valid:
             st.session_state.i += 1
-            # write session state slider
-            # Update the google sheet
-            # 1. Find in which row we need to put the new annotations
             next_row_ind = len(st.session_state.ws.col_values(1)) + 1
-            # 2. Update the sheet
             st.session_state.ws.update('A' + str(next_row_ind), 'tbd')
             st.session_state.ws.update('B' + str(next_row_ind), all_files[st.session_state.i - 1])
             for representative in representative_map_to_column:
-                if representative in st.session_state:
+                if st.session_state[f"{representative}_checkbox"]:
                     letter = representative_map_to_column[representative]
-                    st.session_state.ws.update(letter + str(next_row_ind), str(st.session_state[representative]))
-                    st.session_state.pop(representative)
+                    st.session_state.ws.update(letter + str(next_row_ind), str(st.session_state[f"{representative}_range"]))
+                st.session_state.pop(f"{representative}_range")
+                st.session_state.pop(f"{representative}_checkbox")
     selected_file = all_files[st.session_state.i]
     st.write(selected_file)
     # Filter dataframe based on selected file
@@ -140,11 +145,12 @@ def main():
 def validate_ranges(representative_map_to_column):
     indices_covered = np.full((st.session_state.len_file,), fill_value=False)
     for representative in representative_map_to_column:
-        if representative in st.session_state:
-            if np.any(indices_covered[st.session_state[representative][0]-1:st.session_state[representative][1]]):
+        if st.session_state[f"{representative}_checkbox"]:
+            range_rep = st.session_state[f"{representative}_range"]
+            if np.any(indices_covered[range_rep[0]-1:range_rep[1]]):
                 st.error(f"ranges are incorrect for {representative}")
                 return False
-            indices_covered[st.session_state[representative][0] - 1:st.session_state[representative][1]] = True
+            indices_covered[range_rep[0]-1:range_rep[1]] = True
     return True
 
 
@@ -182,7 +188,22 @@ def display_single_file(color_map, filtered_df):
             unsafe_allow_html=True)
         line_numbers[label] = (line_numbers[label], len(all_paragraphs))
 
+    init_checkbox_and_slider_values(color_map, line_numbers)
+
     generate_sidebar_linking(color_map, line_numbers, len(all_paragraphs)+1)
+
+
+def init_checkbox_and_slider_values(color_map, line_numbers):
+    for rep in color_map:
+        if f"{rep}_checkbox" in st.session_state:
+            continue
+
+        if rep in line_numbers:
+            st.session_state[f"{rep}_checkbox"] = True
+            st.session_state[f"{rep}_range"] = line_numbers[rep]
+        else:
+            st.session_state[f"{rep}_checkbox"] = False
+            st.session_state[f"{rep}_range"] = (1, 1)
 
 
 def get_id_rep(representative):
