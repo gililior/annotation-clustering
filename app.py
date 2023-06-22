@@ -126,6 +126,7 @@ def main():
     if 'color_map' not in st.session_state:
         color_map = generate_colors_map(df)
         st.session_state['color_map'] = color_map
+    if 'column_map' not in st.session_state:
         representative_map_to_column = generate_rep_map_to_column(df)
         st.session_state['column_map'] = representative_map_to_column
     color_map = st.session_state['color_map']
