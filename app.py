@@ -6,30 +6,18 @@ import random
 import gspread
 import string
 
-credentials = {
-  "type": "service_account",
-  "project_id": "cluster-segments",
-  "private_key_id": "8d9cb8b9eba0856375220b5f26f67917d19b7d70",
-  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCNN/rUlJTEUral\nNWh+d+Bk6ssjXCktwtuI77glU24gzMFfFwtHpCilYrljPP7/Ufzyrf1YxOGf3MkR\np4zikrJ5NOuS72j+dvVunAgJiRabIhVnKDAvq3/A/Kkx9UMPgJFN8lyUhkLuq887\n0bMXT+FcqiFUvmW4XBEFT9ZFPnnlms9iifMpebgNr1E+KCNCQ+9a5mh5vaQuJn+l\nNvIdIBo0C06a23fozpKl7Vbk3PQ8sWI/D7M3VEN3o0LKV+tbwme5YO7RePrzBKuN\nZ4yLUH3pYolRpbIwHxT8BbWIgGLs3MhIuFnI7cWzXciQXfIN2VhyLll4Jz2Kvhtz\n/VkZd1r3AgMBAAECggEAEv8kztPt7zrxNugoVlrp5KlxCiCrqWw8+/7DVsISXncs\nzA3dhpWeoiDVr3PVGaN902d0XSye7VJV+foACbqSJ5vm1K1AAnseKPL0YdP/Jn8/\nQdE2KjN3zA4w9Hd5vewdn86qhZBKELEr/3AGF2y3dC+urCewp0w7Peuvd0EgRLKL\nY4LujH6TilR+buYruUzKwZ5vcXXjuubFhPxHK/CvtwyD18rMHH4pnMoXGDYFBTz3\n88/j/L9SdxgvX3bAM7LepsfHKpA3fLpiIv5Pkdvo9DhLYRPVVfuWV6Yx+Nux8s2x\nJgGWwe9a0laDTRQdgi5kStPyOZyWvqJ+S1iRYiymAQKBgQDE8LnvMXbCf4D60Joj\nYoHp0masjw47JwjLZ2JF/jhQVJjkpGHHIWDfRO1KD2tcaWUjd2L6AItYNdmmjbEF\nHHr3H684zz3adCP6B9iNE6uuIEwNkrMS4RmFM+ChoM5QCl0gOpuWAbOYvxzQP/Qd\nJ/fwWderD98SCTG1tPAwVxrncQKBgQC3kXRtc65mMmtpYOBkPsFwcIl1w4DMbmtI\nHFOfVm4v3MTMVcKFW84piVBQmZfFfq5cBxk3OIwT9NFSJFB93wQA0FTZQEY30Jg/\nTcrbr/4q2GI59rlKAALhdYt6JY5zGkMkdpHwvjjgPo13g04cuspz6D6bbeREu9It\nl1w8497E5wKBgAaN0FJCfiZI4fz21jpZO+ORKfOSKzISwXsrbJzRsgQSXKg3RD3B\nQZ0MiS0OyE7h/wioH3YccIa1/BFL49k8smbo+gbU9sT/WncmrbE8N1lrH7zP5f+5\n2ASTzmTymgsV3TWGXcknM1fg/E994VzbCKhKBSBfPdg20B2w8NFbBL0xAoGAbCSr\n04NQHfLcJpOk/kmeSjByOsd3THhMiYnulbMkbNwBsGNhmpEQLpYvk5w4tmfALoUc\nDNUqaONUobC1HsJQqG4TXn2oIF+qIbkhpjTTZshdbcp1NCw3hj1qcwZHGnZBUezs\nY0idVzZivyLC1NgSRyBuKcEetoNz+dnuxAx2g8cCgYBlNmFu8CeXsc2HZ/jf6Ri8\nLztzp3bEXZmjUA/VYaU33t73oZssERW1yGkw6MDHuKJoeHjtql7rBIXLRHzLqaRf\no1ErRtmTf4X0KIpzHzkFIdeQ+ymPrDCAF6XG0aqFFP4G2iT5NdytbCRAkOR1RkMV\nobjqSZeHeh/NidRzkQEbig==\n-----END PRIVATE KEY-----\n",
-  "client_email": "cluster-segments-annotation@cluster-segments.iam.gserviceaccount.com",
-  "client_id": "111788008470838013578",
-  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-  "token_uri": "https://oauth2.googleapis.com/token",
-  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/cluster-segments-annotation%40cluster-segments.iam.gserviceaccount.com",
-  "universe_domain": "googleapis.com"
-}
 
-if "ws" not in st.session_state:
-    gc = gspread.service_account_from_dict(credentials)
-    sh = gc.open("cluster-annotation")
-    st.session_state.ws = sh.worksheet("CUAD")
-    st.session_state.first_row_index = len(st.session_state.ws.col_values(1)) + 1
-    st.session_state.ws.update('A' + str(st.session_state.first_row_index), 'username')
-    st.session_state.ws.update('B' + str(st.session_state.first_row_index), 'filename')
-    st.session_state.ws.update('C' + str(st.session_state.first_row_index), 'file_length')
-    st.session_state.i = 0
-    st.session_state.cur_page = 0
+def init(ws_name):
+    if "ws" not in st.session_state:
+        gc = gspread.service_account("credentials.json")
+        sh = gc.open("cluster-annotation")
+        st.session_state.ws = sh.worksheet(ws_name)
+        st.session_state.first_row_index = len(st.session_state.ws.col_values(1)) + 1
+        st.session_state.ws.update('A' + str(st.session_state.first_row_index), 'username')
+        st.session_state.ws.update('B' + str(st.session_state.first_row_index), 'filename')
+        st.session_state.ws.update('C' + str(st.session_state.first_row_index), 'file_length')
+        st.session_state.i = 0
+        st.session_state.cur_page = 0
 
 
 def generate_random_colors(length):
@@ -117,11 +105,11 @@ def get_user_files_list(all_files):
     st.session_state.user_files_list = one_annotator_file + all_files
 
 
-def main():
+def main(csv_path):
     st.title("Conceptual ToC Annotator")
 
     if "df" not in st.session_state:
-        st.session_state["df"] = load_csv("CUAD.csv")
+        st.session_state["df"] = load_csv(csv_path)
     df = st.session_state["df"]
 
     if 'color_map' not in st.session_state:
@@ -284,9 +272,3 @@ def record_name():
 def next_page():
     st.session_state.cur_page += 1
 
-
-if __name__ == '__main__':
-    if st.session_state.cur_page == 0:
-        hello_page()
-    else:
-        main()
