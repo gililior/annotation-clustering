@@ -7,7 +7,24 @@ import gspread
 import string
 
 
-def init(ws_name):
+INSTRUCTIONS = "For each file, you will be shown a proposed division of the " \
+               "documents to subjects according to a suggested table of contents, and " \
+               "you are asked to improve this division to what you think fits the most." \
+               "  \nTo do so, use the checkbox for each title to include/exclude this " \
+               "section from the current document, and use the slider for each title, " \
+               "to determine which paragraphs are included under this title." \
+               "  \nfew notes:  \n- Not all sections from the table of contents must " \
+               "appear in all documents, and you can control it using the checkbox " \
+               "next to each title in the table of contents." \
+               "  \n- Not all of the document paragraphs must be included as part of the " \
+               "section proposed in the table of contents." \
+               "  \n- The ranges of paragraphs for each section must not overlap. That " \
+               "is, each paragraph can be included as part of only one section (or none)."
+
+
+def init(ws_name, desc):
+    with st.expander("❔ See Instructions"):
+        st.write(desc+INSTRUCTIONS)
     if "ws" not in st.session_state:
         gc = gspread.service_account("credentials.json")
         sh = gc.open("cluster-annotation")
