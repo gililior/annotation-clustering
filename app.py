@@ -72,7 +72,8 @@ def generate_sidebar_linking(color_map, line_numbers, total):
 
 
 def add_widgets_for_rep(representative, total):
-    st.sidebar.checkbox(label=representative, key=f"{representative}_checkbox",
+    st.sidebar.checkbox(label=f"{representative}_checkbox",
+                        key=f"{representative}_checkbox",
                         value=st.session_state[f"{representative}_checkbox"],
                         label_visibility='hidden')
     st.sidebar.select_slider(representative, label_visibility='hidden',
