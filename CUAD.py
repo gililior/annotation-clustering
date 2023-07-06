@@ -1,7 +1,7 @@
 
 from app import init, hello_page, main
 import streamlit as st
-
+import string
 
 CUAD_DESC = "In the following task you will be presented a single file from CUAD " \
             "dataset, consists of legal contracts from various types, " \
