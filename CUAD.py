@@ -12,9 +12,9 @@ CUAD_DESC = "In the following task you will be presented a single file from CUAD
 def generate_rep_map_to_column():
     CUAD_header = ["username", "filename", "file_length", "Marketing And Sales",
                    "Disclaimer Of Warranties", "Payments And Fees", "Indemnification",
-                   "Confidentiality"	"Waiver And Amendment"	"Proprietary Rights"	
+                   "Confidentiality", "Waiver And Amendment", "Proprietary Rights",
                    "Company:  Immunotolerance, Inc",
-                   "Representations, Warranties And Covenants",	"Upon Termination"]
+                   "Representations, Warranties And Covenants", "Upon Termination"]
 
     map_to_columns = {}
     for i, header in enumerate(CUAD_header):
