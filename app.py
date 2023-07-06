@@ -72,8 +72,9 @@ def generate_sidebar_linking(color_map, line_numbers, total):
 
 
 def add_widgets_for_rep(representative, total):
-    st.sidebar.checkbox(label='', key=f"{representative}_checkbox",
-                        value=st.session_state[f"{representative}_checkbox"])
+    st.sidebar.checkbox(label=representative, key=f"{representative}_checkbox",
+                        value=st.session_state[f"{representative}_checkbox"],
+                        label_visibility=False)
     st.sidebar.select_slider(representative, label_visibility='hidden',
                              options=list(np.arange(1, total)),
                              value=st.session_state[f"{representative}_range"],
@@ -81,7 +82,7 @@ def add_widgets_for_rep(representative, total):
                              disabled=not st.session_state[f"{representative}_checkbox"])
 
 
-@st.cache
+@st.cache_data
 def load_csv(file_path):
     return pd.read_csv(file_path)
 
