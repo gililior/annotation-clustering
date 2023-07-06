@@ -137,7 +137,8 @@ def main(csv_path):
     group_by_filename = df.groupby("filename").groups
 
     if 'user_files_list' not in st.session_state:
-        all_files = list(group_by_filename.keys())
+        all_files = [fname for fname in group_by_filename.keys()
+                     if len(group_by_filename[fname] > 1)]
         get_user_files_list(all_files)
     user_files = st.session_state['user_files_list']
 
