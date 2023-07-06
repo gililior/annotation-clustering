@@ -22,6 +22,7 @@ def generate_rep_map_to_column():
             continue
         letter = string.ascii_uppercase[i]
         map_to_columns[header] = letter
+    print(map_to_columns)
 
     return map_to_columns
 

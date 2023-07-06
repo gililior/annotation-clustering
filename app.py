@@ -132,6 +132,7 @@ def main(csv_path):
 
     color_map = st.session_state['color_map']
     representative_map_to_column = st.session_state['column_map']
+    print(representative_map_to_column)
 
     group_by_filename = df.groupby("filename").groups
 
