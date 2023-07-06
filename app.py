@@ -29,10 +29,6 @@ def init(ws_name, desc):
         gc = gspread.service_account("credentials.json")
         sh = gc.open("cluster-annotation")
         st.session_state.ws = sh.worksheet(ws_name)
-        st.session_state.first_row_index = len(st.session_state.ws.col_values(1)) + 1
-        st.session_state.ws.update('A' + str(st.session_state.first_row_index), 'username')
-        st.session_state.ws.update('B' + str(st.session_state.first_row_index), 'filename')
-        st.session_state.ws.update('C' + str(st.session_state.first_row_index), 'file_length')
         st.session_state.i = 0
         st.session_state.cur_page = 0
 
@@ -96,7 +92,6 @@ def generate_rep_map_to_column(df):
     for i, rep in enumerate(representatives):
         index_letter = i+3
         letter = string.ascii_uppercase[index_letter]
-        st.session_state.ws.update(letter + str(st.session_state.first_row_index), rep)
         rep_to_column[rep] = letter
     return rep_to_column
 
@@ -132,9 +127,7 @@ def main(csv_path):
     if 'color_map' not in st.session_state:
         color_map = generate_colors_map(df)
         st.session_state['color_map'] = color_map
-    if 'column_map' not in st.session_state:
-        representative_map_to_column = generate_rep_map_to_column(df)
-        st.session_state['column_map'] = representative_map_to_column
+
     color_map = st.session_state['color_map']
     representative_map_to_column = st.session_state['column_map']
 
