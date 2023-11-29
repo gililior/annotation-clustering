@@ -26,7 +26,7 @@ def init(ws_name, desc):
     with st.expander("❔ See Instructions"):
         st.write(desc+INSTRUCTIONS)
     if "ws" not in st.session_state:
-        gc = gspread.service_account("credentials.json")
+        gc = gspread.service_account_from_dict(st.secrets["credentials.json"])
         sh = gc.open("cluster-annotation")
         st.session_state.ws = sh.worksheet(ws_name)
         st.session_state.i = 0
