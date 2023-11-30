@@ -44,7 +44,7 @@ def generate_random_colors(length):
 
 
 def generate_colors_map(df):
-    representatives = df[df["best_cluster"] == True].representative.unique()
+    representatives = df.representative.unique()
     colors = generate_random_colors(len(representatives))
     color_map = {}
     for i, rep in enumerate(representatives):
@@ -89,7 +89,7 @@ def load_csv(file_path):
 
 
 def generate_rep_map_to_column(df):
-    representatives = df[df["best_cluster"] == True].representative.unique()
+    representatives = df.representative.unique()
     rep_to_column = {}
     for i, rep in enumerate(representatives):
         index_letter = i+3
@@ -251,7 +251,7 @@ def get_paragraphs(filtered_df):
         if i + 1 < len(filtered_df):
             if row['section_text'] == filtered_df.loc[i + 1]['title_text']:
                 paragraph += f"{filtered_df.loc[i + 1]['section_text']}\n\n"
-        label = row["representative"] if row["best_cluster"] else None
+        label = row["representative"]
         prev = current = None
         if i == 0 and label is not None:
             current = label
