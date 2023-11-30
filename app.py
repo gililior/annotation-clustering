@@ -139,7 +139,8 @@ def main(csv_path):
     if 'user_files_list' not in st.session_state:
         all_files = [fname for fname in group_by_filename.keys()
                      if len(group_by_filename[fname] > 1)]
-        get_user_files_list(all_files)
+        # get_user_files_list(all_files)
+        st.session_state['user_files_list'] = all_files
     user_files = st.session_state['user_files_list']
 
     st.sidebar.progress(value=st.session_state.i / len(user_files))
