@@ -132,15 +132,13 @@ def main(csv_path):
 
     color_map = st.session_state['color_map']
     representative_map_to_column = st.session_state['column_map']
-    print(representative_map_to_column)
 
     group_by_filename = df.groupby("filename").groups
 
     if 'user_files_list' not in st.session_state:
         all_files = [fname for fname in group_by_filename.keys()
                      if len(group_by_filename[fname] > 1)]
-        # get_user_files_list(all_files)
-        st.session_state['user_files_list'] = all_files
+        get_user_files_list(all_files)
     user_files = st.session_state['user_files_list']
 
     st.sidebar.progress(value=st.session_state.i / len(user_files))

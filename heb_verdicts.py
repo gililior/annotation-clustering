@@ -30,6 +30,12 @@ if __name__ == '__main__':
     if 'column_map' not in st.session_state:
         representative_map_to_column = generate_rep_map_to_column()
         print(representative_map_to_column)
+        row_ind = 1
+        st.session_state.ws.update('A1', "username")
+        st.session_state.ws.update('B1', "filename")
+        st.session_state.ws.update('C1', "file_length")
+        for representative in representative_map_to_column:
+            st.session_state.ws.update(f'{representative_map_to_column[representative]}1', representative)
         st.session_state['column_map'] = representative_map_to_column
 
     if st.session_state.cur_page == 0:
