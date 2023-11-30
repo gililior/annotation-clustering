@@ -29,6 +29,7 @@ if __name__ == '__main__':
 
     if 'column_map' not in st.session_state:
         representative_map_to_column = generate_rep_map_to_column()
+        print(representative_map_to_column)
         st.session_state['column_map'] = representative_map_to_column
 
     if st.session_state.cur_page == 0:
