@@ -250,7 +250,7 @@ def get_paragraphs(filtered_df):
         if i + 1 < len(filtered_df):
             if row['section_text'] == filtered_df.loc[i + 1]['title_text']:
                 paragraph += f"{filtered_df.loc[i + 1]['section_text']}\n\n"
-        label = row["representative"]
+        label = row["representative"] if row["community"] != -1 else None
         prev = current = None
         if i == 0 and label is not None:
             current = label
