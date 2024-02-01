@@ -6,6 +6,7 @@ import random
 import gspread
 import string
 
+st.set_page_config(layout="wide")
 
 INSTRUCTIONS = "For each file, you will be shown a proposed division of the " \
                "documents to subjects according to a suggested table of contents, and " \
